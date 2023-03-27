@@ -14,8 +14,8 @@
         "liip/imagine-bundle": "^2.4",
         "psr/event-dispatcher": "^1.0",
         "psr/log": "^1.0 || ^2.0 || ^3.0",
-        "setono/doctrine-orm-batcher": "^0.6",
-        "setono/doctrine-orm-batcher-bundle": "^0.4",
+        "setono/doctrine-orm-batcher": "dev-dependency-fixes",
+        "setono/doctrine-orm-batcher-bundle": "dev-dependencies-fix",
         "spatie/enum": "^3.7",
         "sylius/resource-bundle": "^1.6",
         "symfony/config": "^4.4 || ^5.4 || ^6.0",
@@ -52,6 +52,11 @@
         "sort-packages": true,
         "platform": {
             "php": "8.0"
+        },
+        "allow-plugins": {
+            "dealerdirect/phpcodesniffer-composer-installer": true,
+            "ergebnis/composer-normalize": true,
+            "symfony/thanks": true
         }
     },
     "extra": {
@@ -75,7 +80,11 @@
     "repositories": [
         {
             "type": "vcs",
-            "url": "git@github.com:oxyshop/DoctrineORMBatcherBundle.git"
+            "url": "https://github.com/aureliusm/doctrine-orm-batcher.git"
+        },
+        {
+            "type": "vcs",
+            "url": "https://github.com/aureliusm/DoctrineORMBatcherBundle.git"
         }
     ],
     "prefer-stable": true,
