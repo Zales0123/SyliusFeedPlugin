@@ -6,7 +6,7 @@ namespace Setono\SyliusFeedPlugin\Controller\Action\Admin;
 
 use Setono\SyliusFeedPlugin\Message\Command\ProcessFeed;
 use Symfony\Component\HttpFoundation\RedirectResponse;
-use Symfony\Component\HttpFoundation\Session\Flash\FlashBagInterface;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
@@ -17,19 +17,19 @@ final class ProcessFeedAction
 
     private UrlGeneratorInterface $urlGenerator;
 
-    private FlashBagInterface $flashBag;
+    private Request $request;
 
     private TranslatorInterface $translator;
 
     public function __construct(
         MessageBusInterface $commandBus,
         UrlGeneratorInterface $urlGenerator,
-        FlashBagInterface $flashBag,
+        Request $request,
         TranslatorInterface $translator
     ) {
         $this->commandBus = $commandBus;
         $this->urlGenerator = $urlGenerator;
-        $this->flashBag = $flashBag;
+        $this->request = $request;
         $this->translator = $translator;
     }
 
@@ -37,7 +37,8 @@ final class ProcessFeedAction
     {
         $this->commandBus->dispatch(new ProcessFeed($id));
 
-        $this->flashBag->add('success', $this->translator->trans('setono_sylius_feed.feed_generation_triggered'));
+        $session = $this->request->getSession();
+        $session->getFlashBag()->add('success', $this->translator->trans('setono_sylius_feed.feed_generation_triggered'));
 
         return new RedirectResponse($this->urlGenerator->generate('setono_sylius_feed_admin_feed_show', ['id' => $id]));
     }
