@@ -4,12 +4,13 @@ declare(strict_types=1);
 
 namespace Setono\SyliusFeedPlugin\Controller\Action\Admin;
 
-use Setono\SyliusFeedPlugin\Message\Command\ProcessFeed;
-use Symfony\Component\HttpFoundation\RedirectResponse;
-use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Messenger\MessageBusInterface;
-use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Contracts\Translation\TranslatorInterface;
+use Setono\SyliusFeedPlugin\Message\Command\ProcessFeed;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
+use Symfony\Component\HttpFoundation\Session\Flash\FlashBagInterface;
 
 final class ProcessFeedAction
 {
@@ -17,19 +18,19 @@ final class ProcessFeedAction
 
     private UrlGeneratorInterface $urlGenerator;
 
-    private Request $request;
+    private RequestStack $requestStack;
 
     private TranslatorInterface $translator;
 
     public function __construct(
         MessageBusInterface $commandBus,
         UrlGeneratorInterface $urlGenerator,
-        Request $request,
+        RequestStack $requestStack,
         TranslatorInterface $translator
     ) {
         $this->commandBus = $commandBus;
         $this->urlGenerator = $urlGenerator;
-        $this->request = $request;
+        $this->requestStack = $requestStack;
         $this->translator = $translator;
     }
 
@@ -37,8 +38,10 @@ final class ProcessFeedAction
     {
         $this->commandBus->dispatch(new ProcessFeed($id));
 
-        $session = $this->request->getSession();
-        $session->getFlashBag()->add('success', $this->translator->trans('setono_sylius_feed.feed_generation_triggered'));
+        $session = $this->requestStack->getCurrentRequest()->getSession();
+        /** @var FlashBagInterface $flashBag */
+        $flashBag = $session->getBag('flashes');
+        $flashBag->add('success', $this->translator->trans('setono_sylius_feed.feed_generation_triggered'));
 
         return new RedirectResponse($this->urlGenerator->generate('setono_sylius_feed_admin_feed_show', ['id' => $id]));
     }
