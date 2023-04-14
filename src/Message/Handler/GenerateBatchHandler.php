@@ -140,7 +140,7 @@ final class GenerateBatchHandler implements MessageHandlerInterface
 
             foreach ($items as $item) {
                 try {
-                    $contextList = $itemContext->getContextList($item, $channel, $locale);
+                    $contextList = $itemContext->getContextList($item, $channel, $locale, $feed);
 
                     /** @var array|object $context */
                     foreach ($contextList as $context) {
@@ -210,7 +210,7 @@ final class GenerateBatchHandler implements MessageHandlerInterface
 
             try {
                 $this->filesystem->writeStream((string) $path, $stream);
-            } catch (UnableToWriteFile|FilesystemException $exception) {
+            } catch (UnableToWriteFile | FilesystemException $exception) {
                 throw new \RuntimeException('An error occurred when trying to write a feed item');
             } finally {
                 fclose($stream);
@@ -265,8 +265,7 @@ final class GenerateBatchHandler implements MessageHandlerInterface
 
         $requestContext = new RequestContext();
         $requestContext->setScheme('https')
-            ->setHost((string) $channel->getHostname())
-        ;
+            ->setHost((string) $channel->getHostname());
         $this->urlGenerator->setContext($requestContext);
     }
 

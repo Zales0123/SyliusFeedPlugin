@@ -4,41 +4,42 @@ declare(strict_types=1);
 
 namespace Setono\SyliusFeedPlugin\FeedContext\Google\Shopping;
 
+use Webmozart\Assert\Assert;
 use InvalidArgumentException;
+use Symfony\Component\Routing\RouterInterface;
+use Sylius\Component\Core\Model\ImageInterface;
+use Sylius\Component\Core\Model\TaxonInterface;
+use Setono\SyliusFeedPlugin\Model\FeedInterface;
+use Sylius\Component\Core\Model\ChannelInterface;
+use Sylius\Component\Core\Model\ProductInterface;
 use Liip\ImagineBundle\Imagine\Cache\CacheManager;
-use Setono\SyliusFeedPlugin\Feed\Model\Google\Shopping\Availability;
-use Setono\SyliusFeedPlugin\Feed\Model\Google\Shopping\Condition;
-use Setono\SyliusFeedPlugin\Feed\Model\Google\Shopping\Price;
-use Setono\SyliusFeedPlugin\Feed\Model\Google\Shopping\Product;
+use Sylius\Component\Locale\Model\LocaleInterface;
 use Setono\SyliusFeedPlugin\FeedContext\ContextList;
-use Setono\SyliusFeedPlugin\FeedContext\ContextListInterface;
-use Setono\SyliusFeedPlugin\FeedContext\ItemContextInterface;
+use Setono\SyliusFeedPlugin\Model\MpnAwareInterface;
+use Setono\SyliusFeedPlugin\Model\GtinAwareInterface;
+use Setono\SyliusFeedPlugin\Model\SizeAwareInterface;
+use Sylius\Component\Core\Model\ImagesAwareInterface;
 use Setono\SyliusFeedPlugin\Model\BrandAwareInterface;
 use Setono\SyliusFeedPlugin\Model\ColorAwareInterface;
-use Setono\SyliusFeedPlugin\Model\ConditionAwareInterface;
-use Setono\SyliusFeedPlugin\Model\GtinAwareInterface;
-use Setono\SyliusFeedPlugin\Model\LocalizedBrandAwareInterface;
-use Setono\SyliusFeedPlugin\Model\LocalizedColorAwareInterface;
-use Setono\SyliusFeedPlugin\Model\LocalizedSizeAwareInterface;
-use Setono\SyliusFeedPlugin\Model\MpnAwareInterface;
-use Setono\SyliusFeedPlugin\Model\SizeAwareInterface;
-use Setono\SyliusFeedPlugin\Model\TaxonPathAwareInterface;
-use Sylius\Component\Core\Model\ChannelInterface;
-use Sylius\Component\Core\Model\ImageInterface;
-use Sylius\Component\Core\Model\ImagesAwareInterface;
-use Sylius\Component\Core\Model\ProductImagesAwareInterface;
-use Sylius\Component\Core\Model\ProductInterface;
-use Sylius\Component\Core\Model\ProductTranslationInterface;
 use Sylius\Component\Core\Model\ProductVariantInterface;
-use Sylius\Component\Core\Model\TaxonInterface;
-use Sylius\Component\Inventory\Checker\AvailabilityCheckerInterface;
-use Sylius\Component\Locale\Model\LocaleInterface;
-use Sylius\Component\Resource\Model\TranslatableInterface;
 use Sylius\Component\Resource\Model\TranslationInterface;
+use Setono\SyliusFeedPlugin\Model\ConditionAwareInterface;
+use Setono\SyliusFeedPlugin\Model\TaxonPathAwareInterface;
+use Sylius\Component\Resource\Model\TranslatableInterface;
+use Sylius\Component\Core\Model\ProductImagesAwareInterface;
+use Sylius\Component\Core\Model\ProductTranslationInterface;
+use Setono\SyliusFeedPlugin\Feed\Model\Google\Shopping\Price;
+use Setono\SyliusFeedPlugin\FeedContext\ContextListInterface;
+use Setono\SyliusFeedPlugin\FeedContext\ItemContextInterface;
+use Setono\SyliusFeedPlugin\Model\LocalizedSizeAwareInterface;
 use Sylius\Component\Taxonomy\Model\TaxonTranslationInterface;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
-use Symfony\Component\Routing\RouterInterface;
-use Webmozart\Assert\Assert;
+use Setono\SyliusFeedPlugin\Feed\Model\Google\Shopping\Product;
+use Setono\SyliusFeedPlugin\Model\LocalizedBrandAwareInterface;
+use Setono\SyliusFeedPlugin\Model\LocalizedColorAwareInterface;
+use Setono\SyliusFeedPlugin\Feed\Model\Google\Shopping\Condition;
+use Setono\SyliusFeedPlugin\Feed\Model\Google\Shopping\Availability;
+use Sylius\Component\Inventory\Checker\AvailabilityCheckerInterface;
 
 class ProductItemContext implements ItemContextInterface
 {
@@ -58,7 +59,7 @@ class ProductItemContext implements ItemContextInterface
         $this->availabilityChecker = $availabilityChecker;
     }
 
-    public function getContextList(object $product, ChannelInterface $channel, LocaleInterface $locale): ContextListInterface
+    public function getContextList(object $product, ChannelInterface $channel, LocaleInterface $locale, FeedInterface $feed): ContextListInterface
     {
         if (!$product instanceof ProductInterface) {
             throw new InvalidArgumentException(sprintf(
