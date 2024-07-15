@@ -16,6 +16,7 @@ use Setono\SyliusFeedPlugin\FeedContext\ItemContextInterface;
 use Setono\SyliusFeedPlugin\Model\BrandAwareInterface;
 use Setono\SyliusFeedPlugin\Model\ColorAwareInterface;
 use Setono\SyliusFeedPlugin\Model\ConditionAwareInterface;
+use Setono\SyliusFeedPlugin\Model\FeedInterface;
 use Setono\SyliusFeedPlugin\Model\GtinAwareInterface;
 use Setono\SyliusFeedPlugin\Model\LocalizedBrandAwareInterface;
 use Setono\SyliusFeedPlugin\Model\LocalizedColorAwareInterface;
@@ -58,8 +59,12 @@ class ProductItemContext implements ItemContextInterface
         $this->availabilityChecker = $availabilityChecker;
     }
 
-    public function getContextList(object $product, ChannelInterface $channel, LocaleInterface $locale): ContextListInterface
-    {
+    public function getContextList(
+        object $product,
+        ChannelInterface $channel,
+        LocaleInterface $locale,
+        FeedInterface $feed,
+    ): ContextListInterface {
         if (!$product instanceof ProductInterface) {
             throw new InvalidArgumentException(sprintf(
                 'The class %s is not an instance of %s',
