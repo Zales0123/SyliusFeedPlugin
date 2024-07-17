@@ -6,11 +6,6 @@ namespace Setono\SyliusFeedPlugin\Message\Handler;
 
 use Doctrine\Persistence\ObjectManager;
 use InvalidArgumentException;
-use const JSON_INVALID_UTF8_IGNORE;
-use const JSON_PRESERVE_ZERO_FRACTION;
-use const JSON_PRETTY_PRINT;
-use const JSON_UNESCAPED_SLASHES;
-use const JSON_UNESCAPED_UNICODE;
 use League\Flysystem\FilesystemInterface;
 use League\Flysystem\FilesystemOperator;
 use Psr\EventDispatcher\EventDispatcherInterface;
@@ -40,10 +35,15 @@ use Symfony\Component\Serializer\SerializerInterface;
 use Symfony\Component\Validator\ConstraintViolationInterface;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 use Symfony\Component\Workflow\Registry;
-use Symfony\Component\Workflow\Workflow;
+use Symfony\Component\Workflow\WorkflowInterface;
 use Throwable;
 use Twig\Environment;
 use Webmozart\Assert\Assert;
+use const JSON_INVALID_UTF8_IGNORE;
+use const JSON_PRESERVE_ZERO_FRACTION;
+use const JSON_PRETTY_PRINT;
+use const JSON_UNESCAPED_SLASHES;
+use const JSON_UNESCAPED_UNICODE;
 
 /**
  * @psalm-suppress UndefinedDocblockClass
@@ -299,7 +299,7 @@ final class GenerateBatchHandler implements MessageHandlerInterface
         $this->urlGenerator->setContext($this->initialRequestContext);
     }
 
-    private function getWorkflow(FeedInterface $feed): Workflow
+    private function getWorkflow(FeedInterface $feed): WorkflowInterface
     {
         try {
             $workflow = $this->workflowRegistry->get($feed, FeedGraph::GRAPH);
@@ -323,7 +323,7 @@ final class GenerateBatchHandler implements MessageHandlerInterface
         return fopen('php://temp', 'w+b');
     }
 
-    private function applyErrorTransition(Workflow $workflow, FeedInterface $feed): void
+    private function applyErrorTransition(WorkflowInterface $workflow, FeedInterface $feed): void
     {
         // if the feed is already errored we won't want to throw an exception
         if ($feed->isErrored()) {
